@@ -1,4 +1,3 @@
-const product = require("../model/Product");
 const Product = require("../model/Product");
 
 //  Get all products controller
