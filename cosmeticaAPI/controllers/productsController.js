@@ -36,7 +36,7 @@ const getProductById = async (req, res) => {
       return res.status(404).json({
         success: false,
         messsage: `Cannot find product with ID ${id} provided`,
-      }); // Found product but doesn't match with the provided ID. Bad request
+      }); // Not Found!
 
     // Send Product
     res.status(200).json({ success: true, data: product });
