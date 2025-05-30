@@ -1,35 +1,40 @@
-const dotenv = require("dotenv");
+require("dotenv").config();
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const corsOption = require("./config/corsOption");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
-dotenv.config();
+const connectDB = require("./config/dbConnection");
 
-const app = express(); // Initialize app
+const app = express();
+const PORT = process.env.PORT || 3500;
 
-const PORT = process.env.PORT || 3500; // Port
+// connect DB
+connectDB();
 
+// middleware for cors
 app.use(cors(corsOption));
 
+// Middleware for cookies
 app.use(cookieParser());
 
-// If our router matches all routes
-// app.all("*", (req, res) => {
-//   res.status(400);
-//   req.accepts("html")
-//     ? res.sendFile(path.join(__dirname,  "public", "pages", "404.html"))
-//     : req.accepts("json")
-//     ? res.send({ message: `Resource not found` })
-//     : res.type("txt").send("Resource not found");
-// });
+// middleware for parsing json files
+app.use(express.json());
 
-// for our middleware
+// serve static files
+app.use("/", express.static(path.join(__dirname, "/public")));
 
-// app.use((err, req, res, next)=>{
-//     console.log(err.stack);
-//     res.status(500).send('Something broke!')
-// })
+app.use("/products", require("./routes/products"));
 
-app.listen(PORT, () => console.log(`server started on ${PORT}`));
+// Server errors
+app.use((err, req, res, next) => {
+  console.log(err.stack);
+  res.status(500).send("Something broke!");
+});
+
+// Make our app listen to PORT only when connected to DB
+mongoose.connection.once("open", () => {
+  console.log("Successfully connected to DB");
+  app.listen(PORT, () => console.log(`server started on ${PORT}`));
+});

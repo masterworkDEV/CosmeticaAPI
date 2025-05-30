@@ -6,7 +6,7 @@ const getAllProducts = async (req, res) => {
   const products = await Product.find();
   try {
     if (products.length === 0 || !products) {
-      res
+      return res
         .status(404)
         .json({ success: false, message: `No product was found at this time` });
     }
@@ -14,7 +14,7 @@ const getAllProducts = async (req, res) => {
       .status(200)
       .json({ success: true, count: products.length, data: products });
   } catch (error) {
-    console.log("Error in getAllProducts", err);
+    console.log("Error in getAllProducts", error);
     res.status(500).json({ message: `Server error ${error.message}` });
   }
 };
@@ -85,7 +85,7 @@ const createProduct = async (req, res) => {
 
 // Update product controller
 const updateProduct = async (req, res) => {
-  const { id } = req.body || req.params;
+  const { id } = req.params;
 
   if (!id || !Product.Types.ObjectId.isValid(id)) {
     res.status(400).json({

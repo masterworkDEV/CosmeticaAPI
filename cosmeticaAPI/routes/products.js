@@ -1,7 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
-// Import controllers or handlers.
 const productsController = require("../controllers/productsController");
 
 router
@@ -13,9 +11,11 @@ router
 router
   .route("/:id")
   .get(productsController.getProductById)
-  .put()
+  .put(productsController.updateProduct)
   .delete(productsController.deleteProduct);
 
 router.get("/categories", productsController.getProductByCategory);
-router.post("/categories");
-router.get("/categories/:id");
+// router.post("/categories");
+// router.get("/categories/:id");
+
+module.exports = router;

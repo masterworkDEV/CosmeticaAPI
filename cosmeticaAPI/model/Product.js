@@ -26,7 +26,7 @@ const productSchema = new Schema(
       maxlength: [50, "Brand name cannot exceed 50 characters."],
     },
     category: {
-      type: mongoose.Schema.Types.ObjectId, // Link to a separate Category model
+      type: String,
       ref: "Category", // The name of the Category model
       required: [true, "Product category is required."],
     },
