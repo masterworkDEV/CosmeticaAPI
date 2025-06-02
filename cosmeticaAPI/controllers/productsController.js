@@ -24,7 +24,7 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   const { id } = req.params;
   if (!id || !Product.base.Types.ObjectId.isValid(id)) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: `A valid product ID is required for this operation`,
     });
@@ -197,9 +197,10 @@ const deleteProduct = async (req, res) => {
 const getProductByCategory = async (req, res) => {
   const { category } = req.query;
   if (!category)
-    return res
-      .status(400)
-      .json({ success: false, message: `This field is required` });
+    return res.status(400).json({
+      success: false,
+      message: `Category query parameter is required`,
+    });
 
   try {
     const productByCategory = await Product.find({ category: category });
