@@ -30,7 +30,7 @@ const getProductById = async (req, res) => {
     });
   }
   try {
-    const product = await Product.findById(id);
+    const product = await Product.findOne({ _id: id });
     if (!product)
       return res.status(404).json({
         success: false,
@@ -87,50 +87,79 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   const { id } = req.params;
 
-  if (!id || !Product.Types.ObjectId.isValid(id)) {
-    res.status(400).json({
+  if (!id) {
+    return res.status(400).json({
       success: false,
       message: `An ID is required for update`,
     });
+  }
 
-    // Since there are many fields and we can't go about and start listing them.
-    const updates = req.body;
+  // Ensure the ID is a valid MongoDB ObjectId
+  if (!Product.base.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      success: false,
+      message: `A valid product ID is required for this operation`,
+    });
+  }
 
-    try {
-      const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
-        new: true,
-        runValidators: true,
-        context: "query",
-      });
+  const updates = req.body;
 
-      if (!updatedProduct)
-        return res
-          .status(404)
-          .json({ success: false, message: `No products found` });
+  // If req.body is empty, there's nothing to update
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: `No update data provided.`,
+    });
+  }
 
-      // Updated product
-      res.status(200).json({
-        success: true,
-        message: `Product with the ID ${id} is successfully updated`,
-        data: updatedProduct,
-      });
-    } catch (error) {
-      console.error("Error in updateProduct", error);
-      res.status(500).json({
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedProduct) {
+      return res
+        .status(404)
+        .json({ success: false, message: `No product found with ID ${id}` });
+    }
+
+    // Send updated product
+    res.status(200).json({
+      success: true,
+      message: `Product with the ID ${id} is successfully updated`,
+      data: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error in updateProduct:", error); // Use more specific error message
+    // Handle Mongoose validation errors specifically
+    if (error.name === "ValidationError") {
+      const errors = {};
+      for (let field in error.errors) {
+        errors[field] = error.errors[field].message;
+      }
+      return res.status(400).json({
         success: false,
-        message: `Error deleting product: ${error.message}`,
+        message: "Validation failed during update",
+        errors: errors,
       });
     }
+
+    // 3. Corrected error message in catch block
+    res.status(500).json({
+      success: false,
+      message: `Server error during product update: ${error.message}`,
+    });
   }
 };
 
 // Delete product controller
 
 const deleteProduct = async (req, res) => {
-  const { id } = req.body || req.params;
+  const { id } = req.params;
 
   //   check if body or params has an ID
-  if (!id || !Product.Types.ObjectId.isValid(id)) {
+  if (!id) {
     res.status(400).json({
       success: false,
       message: `An ID is required for this operation`,
@@ -166,24 +195,25 @@ const deleteProduct = async (req, res) => {
 // Get | Post |  by categories
 
 const getProductByCategory = async (req, res) => {
-  const { category } = req.body;
+  const { category } = req.query;
   if (!category)
     return res
       .status(400)
       .json({ success: false, message: `This field is required` });
 
   try {
-    const productByCategory = await Product.findOne({ category: category });
+    const productByCategory = await Product.find({ category: category });
 
-    if (!productByCategory)
+    if (productByCategory.length === 0 || !productByCategory) {
       return res.status(404).json({
         success: false,
         message: `No product found in the selected category: ${category}`,
       });
+    }
 
     res.status(200).json({
       success: true,
-      message: `${category.length} Products found `,
+      message: `${productByCategory.length} Products found `,
       data: productByCategory,
     });
   } catch (error) {

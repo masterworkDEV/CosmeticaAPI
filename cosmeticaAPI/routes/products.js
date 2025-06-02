@@ -5,16 +5,15 @@ const productsController = require("../controllers/productsController");
 router
   .route("/")
   .get(productsController.getAllProducts)
-  .post(productsController.createProduct)
-  .put(productsController.updateProduct);
+  .post(productsController.createProduct);
 
 router
   .route("/:id")
   .get(productsController.getProductById)
-  .put(productsController.updateProduct)
-  .delete(productsController.deleteProduct);
+  .delete(productsController.deleteProduct)
+  .put(productsController.updateProduct);
 
-router.get("/categories", productsController.getProductByCategory);
+router.route("/category").get(productsController.getProductByCategory);
 // router.post("/categories");
 // router.get("/categories/:id");
 
