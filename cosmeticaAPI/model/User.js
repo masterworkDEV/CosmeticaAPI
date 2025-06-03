@@ -99,8 +99,8 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
+// userSchema.index({ username: 1 });
+// userSchema.index({ email: 1 });
 
 const user = mongoose.model("User", userSchema);
 module.exports = user;

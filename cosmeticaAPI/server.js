@@ -25,6 +25,8 @@ app.use(express.json());
 // serve static files
 app.use("/", express.static(path.join(__dirname, "/public")));
 
+// routes
+app.use("/register", require("./routes/register"));
 app.use("/products", require("./routes/products"));
 
 // Server errors

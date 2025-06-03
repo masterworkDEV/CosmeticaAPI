@@ -8,14 +8,13 @@ router
   .post(productsController.createProduct);
 
 router.get("/category", productsController.getProductByCategory);
+router.get("/category/:id", productsController.getOneProductInCategory);
+// router.post("/category");
 
 router
   .route("/:id")
   .get(productsController.getProductById)
   .delete(productsController.deleteProduct)
   .put(productsController.updateProduct);
-
-// router.post("/categories");
-// router.get("/categories/:id");
 
 module.exports = router;

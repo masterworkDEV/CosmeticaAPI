@@ -1,7 +1,6 @@
 const Product = require("../model/Product");
 
 //  Get all products controller
-
 const getAllProducts = async (req, res) => {
   const products = await Product.find();
   try {
@@ -49,6 +48,18 @@ const getProductById = async (req, res) => {
 
 // Create product controller
 const createProduct = async (req, res) => {
+  const { name, brand, category } = req.body;
+  const duplicate = await Product.findOne({
+    name: name,
+    category: category,
+    brand: brand,
+  });
+  if (duplicate) {
+    return res.status(409).json({
+      success: false,
+      message: `Product with the name '${name}' already exist`,
+    }); // conflict
+  }
   try {
     // Instantiate new product or "const product = await Product.create(req.body)" this will also validate all fields for us.
     const newProduct = new Product(req.body);
@@ -160,7 +171,7 @@ const deleteProduct = async (req, res) => {
 
   //   check if body or params has an ID
   if (!id) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: `An ID is required for this operation`,
     });
@@ -226,7 +237,32 @@ const getProductByCategory = async (req, res) => {
   }
 };
 
-const getOneProductInCategory = async (req, res) => {};
+const getOneProductInCategory = async (req, res) => {
+  const { id, category } = req.query;
+  if (!category)
+    return res.status(400).json({
+      success: false,
+      message: `Category query parameter is required`,
+    });
+
+  try {
+    const productInCategory = await Product.findOne({
+      category: category,
+      _id: id,
+    });
+
+    if (!productInCategory) {
+      return res.status(404).json({
+        success: false,
+        message: `No product in this category matches ID ${id}`,
+      });
+    }
+
+    res.status(200).json({ success: true, data: productInCategory });
+  } catch (error) {
+    console.error("Error in getOneProductInCategory", error);
+  }
+};
 
 module.exports = {
   getAllProducts,
@@ -236,6 +272,6 @@ module.exports = {
   deleteProduct,
 
   // Products by category
-
   getProductByCategory,
+  getOneProductInCategory,
 };
