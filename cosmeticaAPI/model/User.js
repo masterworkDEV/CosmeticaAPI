@@ -46,16 +46,22 @@ const userSchema = new Schema(
 
     firstName: {
       type: String,
+      required: [true, "Firstname is required."],
+
       trim: true,
       maxlength: [50, "First name cannot exceed 50 characters."],
     },
     lastName: {
       type: String,
+      required: [true, "Lastname is required."],
+
       trim: true,
       maxlength: [50, "Last name cannot exceed 50 characters."],
     },
     phoneNumber: {
       type: String,
+      required: [true, "Phone number is required."],
+
       trim: true,
       match: [/^\+?\d{10,15}$/, "Please enter a valid phone number."],
     },

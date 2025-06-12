@@ -1,3 +1,4 @@
+// import dependencies
 require("dotenv").config();
 const path = require("path");
 const express = require("express");
@@ -6,9 +7,17 @@ const corsOption = require("./config/corsOption");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const connectDB = require("./config/dbConnection");
-
 const app = express();
 const PORT = process.env.PORT || 3500;
+
+// middlewares
+const handleJWT = require("./middlewares/verifyJWT");
+
+// Import  routes
+const productsRoute = require("./routes/products");
+const registerRoute = require("./routes/register");
+const loginRoute = require("./routes/login");
+const refreshToken = require("./routes/refresh");
 
 // connect DB
 connectDB();
@@ -16,7 +25,7 @@ connectDB();
 // middleware for cors
 app.use(cors(corsOption));
 
-// Middleware for cookies
+// Middleware for parsing cookies
 app.use(cookieParser());
 
 // middleware for parsing json files
@@ -25,9 +34,14 @@ app.use(express.json());
 // serve static files
 app.use("/", express.static(path.join(__dirname, "/public")));
 
-// routes
-app.use("/register", require("./routes/register"));
-app.use("/products", require("./routes/products"));
+// use routes
+app.use("/register", registerRoute);
+app.use("/login", loginRoute);
+app.use("/refresh", refreshToken);
+
+// middleware for our custom JWT
+app.use(handleJWT);
+app.use("/products", productsRoute);
 
 // Server errors
 app.use((err, req, res, next) => {

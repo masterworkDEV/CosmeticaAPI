@@ -1,7 +1,16 @@
 const User = require("../model/User");
 
 const handleNewUser = async (req, res) => {
-  const { username, email } = req.body;
+  const { username, email, password } = req.body;
+
+
+  if(!username | password){
+    return res.status(400).json({success: false,message: "Username and Password are reqiured"})
+  }
+
+
+
+
 
   //    check for existing email and password. mongoose does the firstname and other checks in the background.
   const existingUser = await User.findOne({ username: username });
