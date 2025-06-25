@@ -1,13 +1,12 @@
-//
 
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const handleLogin = async (req, res) => {
-  const { email, password } = req.body; // Destructure email and password
+  const { email, password } = req.body; 
 
-  // 1. Initial input validation
+
   if (!email || !password) {
     return res
       .status(400)
@@ -19,22 +18,19 @@ const handleLogin = async (req, res) => {
     // Using .select('+password') if password is set to select: false in schema
     const foundUser = await User.findOne({ email: email }).select("+password");
 
-    // 3. When we can't find a user (or password doesn't match later)
+
     if (!foundUser) {
-      // Use 401 Unauthorized to avoid giving away if user exists or not
       return res.status(401).json({
         success: false,
         message: "Invalid credentials (email or password incorrect).",
       });
     }
 
-    // 4. Verify password if it matches with our hashed password.
-    // CORRECTED: Plain-text password first, then the hashed password
+
     const match = await bcrypt.compare(password, foundUser.password);
 
     if (match) {
       const roles = Object.values(foundUser.roles || {});
-
       // 5. Generate Access Token
       const accessToken = jwt.sign(
         { userInfo: { username: foundUser.username, roles: roles } },
@@ -42,18 +38,16 @@ const handleLogin = async (req, res) => {
         { expiresIn: "300s" } // 5 minutes
       );
 
-      // 6. Generate new refresh token (simplified payload - no roles)
+
       const refreshToken = jwt.sign(
         { userInfo: { username: foundUser.username } },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "1d" } // 1 day
       );
 
-      // 7. Save new refresh token to the user in the database
+
       foundUser.refreshToken = refreshToken;
-      // It's good practice to save only the necessary fields if you're concerned about performance
-      // For example: await User.updateOne({ _id: foundUser._id }, { refreshToken: refreshToken });
-      await foundUser.save(); // This will save the whole document
+      await foundUser.save(); 
 
       // 8. Set new refresh token in httpOnly cookie
       res.cookie("jwt", refreshToken, {
