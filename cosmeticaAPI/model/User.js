@@ -1,5 +1,10 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const sendEmail = require("../utils/emailService");
+
+// create instance
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
@@ -105,8 +110,40 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// userSchema.index({ username: 1 });
-// userSchema.index({ email: 1 });
+userSchema.post("save", async function (doc, next) {
+  if (!this.isNew) {
+    return next();
+  }
+
+  const authorisedEmail = process.env.GMAIL_EMAIL;
+  const authorisedPassword = process.env.GMAIL_PASSWORD;
+
+  if (!authorisedEmail || !authorisedPassword) {
+    console.error(
+      "Nodemailer credentials are not set. Email notification skipped."
+    );
+    return next(); // Continue without sending email
+  }
+
+  // set registeration message
+
+  const userEmail = doc.email;
+  const username = doc.username;
+  const subject = `Welcome To SK-stitch Collections And Wears `;
+  const htmlContent = `
+      <p>Hello ${username},</p>
+      <p>Your account has been successfully created on our platform.</p>
+      <p>Thank you for joining us!</p>
+      <p>Best regards,</p>
+      <p>The SK-stitch Team</p>
+`;
+
+  sendEmail(userEmail, subject, htmlContent)
+    .catch((error) =>
+      console.error(`Failed to send registeration email ${error}`)
+    )
+    .finally(() => next());
+});
 
 const user = mongoose.model("User", userSchema);
 module.exports = user;

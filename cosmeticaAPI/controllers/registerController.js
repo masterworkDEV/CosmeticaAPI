@@ -1,21 +1,21 @@
 const User = require("../model/User");
 
 const handleNewUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, firstName, lastName, phoneNumber, password } =
+    req.body;
 
-
-  if(!username | password){
-    return res.status(400).json({success: false,message: "Username and Password are reqiured"})
+  if (!username || !password || !firstName || !lastName || !phoneNumber) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "All required fields (username, password, firstName, lastName, phoneNumber) are required.",
+    });
   }
-
-
-
-
 
   //    check for existing email and password. mongoose does the firstname and other checks in the background.
   const existingUser = await User.findOne({ username: username });
   if (existingUser)
-    res
+    return res
       .status(409)
       .json({ success: false, message: "This username already exist" }); //conflict
 
@@ -26,7 +26,14 @@ const handleNewUser = async (req, res) => {
       .json({ success: false, message: "This email already  exist" }); //conflict
 
   try {
-    const newUser = await User.create(req.body);
+    const newUser = await User.create({
+      username,
+      email,
+      firstName,
+      lastName,
+      phoneNumber,
+      password,
+    });
     res.status(201).json({
       success: true,
       message: `New user ${username} created`,

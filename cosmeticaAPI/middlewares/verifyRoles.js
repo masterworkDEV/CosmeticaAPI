@@ -1,12 +1,20 @@
-const verifyUserRoles = (...userRoles) => {
+const verifyUserRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    const { roles } = req.roles;
-    if (!roles) return res.sendstatus(403); // Forbidden
-    const validateUserRoles = [...userRoles];
-    const result = roles
-      .map((role) => validateUserRoles.includes(role))
-      .find((val) => val === true);
-    if (!result) return res.sendStatus(401);
+    if (!req.user || !req.user.roles) {
+      return res.status(403).json({
+        message: "Access Denied: User roles not found or not authenticated.",
+      });
+    }
+    const { roles } = req.user;
+
+    const availableRoles = [...allowedRoles];
+    const hasPermission = roles.some((role) => availableRoles.includes(role));
+    if (!hasPermission) {
+      return res.status(403).json({
+        message: "Access Denied: You do not have the required permissions.",
+      });
+    }
+
     next();
   };
 };
