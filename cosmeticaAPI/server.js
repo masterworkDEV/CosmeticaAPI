@@ -39,8 +39,7 @@ app.use("/register", registerRoute);
 app.use("/login", loginRoute);
 app.use("/refresh", refreshToken);
 
-// middleware for our custom JWT
-app.use(handleJWT);
+// product routes
 app.use("/products", productsRoute);
 
 // Server errors
