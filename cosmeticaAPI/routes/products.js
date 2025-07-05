@@ -36,11 +36,7 @@ router.get(
 
 router
   .route("/:id")
-  .get(
-    isAuthenticated,
-    userRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.User),
-    productsController.getProductById
-  )
+  .get(productsController.getProductById)
   .delete(
     isAuthenticated,
     userRoles(ROLES_LIST.Admin),
