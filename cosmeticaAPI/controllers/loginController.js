@@ -55,10 +55,10 @@ const handleLogin = async (req, res) => {
       // 9. Send success response
       res.status(200).json({
         success: true,
-        message: `${foundUser.username} is successfully logged in.`, // Use foundUser.username
+        message: `${foundUser.username} is successfully logged in.`,
         data: {
           accessToken: accessToken,
-          userInfo: { username: foundUser.username, roles: roles },
+          userInfo: foundUser,
         },
       });
 
@@ -77,19 +77,13 @@ const handleLogin = async (req, res) => {
           console.error(`Failed to send login notification email${emailError}`)
       );
     } else {
-      // 10. Handle password mismatch (invalid credentials)
       return res.status(401).json({
-        // 401 Unauthorized
         success: false,
         message: "Invalid credentials (email or password incorrect).",
       });
     }
   } catch (error) {
-    // 11. General error handling for any unexpected issues
-    console.error("Error during login:", error); // Log the actual error for debugging
-
-    // Handle other types of errors (e.g., database connection issues, JWT errors)
-    // Avoid sending internal error details to the client in production
+    console.error("Error during login:", error);
     res.status(500).json({
       success: false,
       message: "An unexpected error occurred during login.",

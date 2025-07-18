@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-// isAuthenticated
-const isAuthenticated = require("../middlewares/verifyJWT");
+// isProtected
+const isProtected = require("../middlewares/verifyJWT");
 
 // product handler
 const productsController = require("../controllers/productsController");
@@ -15,20 +15,21 @@ router
   .route("/")
   .get(productsController.getAllProducts)
   .post(
-    isAuthenticated,
+    isProtected,
     userRoles(ROLES_LIST.Admin, ROLES_LIST.Editor),
+    productsController.upload.single("image"),
     productsController.createProduct
   );
 
 router.get(
   "/category",
-  isAuthenticated,
+  isProtected,
   userRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.User),
   productsController.getProductByCategory
 );
 router.get(
   "/category/:id",
-  isAuthenticated,
+  isProtected,
   userRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.User),
   productsController.getOneProductInCategory
 );
@@ -38,13 +39,14 @@ router
   .route("/:id")
   .get(productsController.getProductById)
   .delete(
-    isAuthenticated,
+    isProtected,
     userRoles(ROLES_LIST.Admin),
     productsController.deleteProduct
   )
   .put(
-    isAuthenticated,
+    isProtected,
     userRoles(ROLES_LIST.Admin, ROLES_LIST.Editor),
+    productsController.upload.single("image"),
     productsController.updateProduct
   );
 

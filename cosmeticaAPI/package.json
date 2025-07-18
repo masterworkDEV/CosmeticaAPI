@@ -1,7 +1,7 @@
 {
   "name": "fashion-api",
   "version": "1.0.0",
-  "description": "This is my first API for my frontend application",
+  "description": "This is an API for a fashion store.",
   "main": "server.js",
   "scripts": {
     "start": "node server",
@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
@@ -21,6 +22,7 @@
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.3",
+    "multer": "^2.0.1",
     "nodemailer": "^7.0.3"
   }
 }

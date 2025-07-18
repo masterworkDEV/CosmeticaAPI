@@ -49,7 +49,7 @@ const productSchema = new Schema(
 
     images: [
       {
-        type: String, // Store image URLs (e.g., from a CDN like Cloudinary, AWS S3)
+        type: [] || String, // Store image URLs (e.g., from a CDN like Cloudinary, AWS S3)
         trim: true,
       },
     ],
