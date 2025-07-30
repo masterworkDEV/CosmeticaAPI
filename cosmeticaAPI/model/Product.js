@@ -8,29 +8,39 @@ const productSchema = new Schema(
       required: [true, "Product name is required."],
       trim: true,
       minlength: [3, "Product name must be at least 3 characters long."],
-      maxlength: [100, "Product name cannot exceed 100 characters."],
+      maxlength: [120, "Product name cannot exceed 120 characters."],
     },
     description: {
       type: String,
       required: [true, "Product description is required."],
       trim: true,
       minlength: [
-        10,
-        "Product description must be at least 10 characters long.",
+        20,
+        "Product description must be at least 20 characters long.",
       ],
+      maxlength: [1000, "Product description cannot exceed 1000 characters."],
     },
-    brand: {
+    designer: {
       type: String,
-      required: [true, "Brand name is required."],
+      required: [true, "Designer name is required."],
       trim: true,
-      maxlength: [50, "Brand name cannot exceed 50 characters."],
+      maxlength: [70, "Designer name cannot exceed 70 characters."],
     },
     category: {
       type: String,
-      ref: "Category", // The name of the Category model
+      ref: "Category",
       required: [true, "Product category is required."],
     },
-
+    subCategory: {
+      type: String,
+      trim: true,
+      maxlength: [70, "Sub-category name cannot exceed 70 characters."],
+    },
+    gender: {
+      type: String,
+      enum: ["Men", "Women", "Unisex", "Kids"],
+      default: "Unisex",
+    },
     price: {
       type: Number,
       required: [true, "Price is required."],
@@ -46,16 +56,54 @@ const productSchema = new Schema(
       min: [0, "Stock count cannot be negative."],
       default: 0,
     },
-
+    sizes: {
+      // E.g., ['S', 'M', 'L', 'XL'], ['One Size'], ['EU 38', 'EU 40']
+      type: [String],
+      enum: ["XS", "S", "M", "L", "XL", "XXL", "One Size", "Custom"],
+      default: [], // Or consider a more flexible structure for size charts
+    },
+    colors: {
+      // E.g., ['Red', 'Blue', 'Black']
+      type: [String],
+      default: [],
+    },
+    materials: {
+      // E.g., ['Cotton', 'Silk', 'Leather', 'Polyester blend']
+      type: [String],
+      default: [],
+    },
+    style: {
+      // E.g., 'Bohemian', 'Minimalist', 'Streetwear', 'Formal'
+      type: [String],
+      default: [],
+    },
+    collection: {
+      // E.g., 'Spring/Summer 2025', 'Limited Edition', 'Bridal Collection'
+      type: String,
+      trim: true,
+      maxlength: [80, "Collection name cannot exceed 80 characters."],
+    },
+    season: {
+      type: [String],
+      enum: ["Spring", "Summer", "Autumn", "Winter", "All-Season"],
+      default: ["All-Season"],
+    },
+    careInstructions: {
+      type: String,
+      trim: true,
+      maxlength: [300, "Care instructions cannot exceed 300 characters."],
+    },
     images: [
       {
-        type: [] || String, // Store image URLs (e.g., from a CDN like Cloudinary, AWS S3)
-        trim: true,
+        url: { type: String, trim: true, required: true }, // Store image URLs
+        altText: { type: String, trim: true, maxlength: 100 },
       },
     ],
     thumbnail: {
+      // Primary image for listings
       type: String,
       trim: true,
+      required: [true, "Thumbnail image is required."],
     },
     rating: {
       type: Number,
@@ -67,37 +115,6 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
-    skinType: {
-      type: [String],
-      enum: ["Normal", "Dry", "Oily", "Combination", "Sensitive", "All"],
-      default: ["All"],
-    },
-    concerns: {
-      type: [String],
-      enum: [
-        "Acne",
-        "Aging",
-        "Redness",
-        "Dullness",
-        "Hydration",
-        "Oil Control",
-        "Dark Spots",
-      ],
-      default: [],
-    },
-    ingredients: {
-      type: [String],
-      default: [],
-    },
-    volume: {
-      type: String,
-      trim: true,
-    },
-    shade: {
-      type: String,
-      trim: true,
-    },
-
     isFeatured: {
       type: Boolean,
       default: false,
@@ -108,7 +125,7 @@ const productSchema = new Schema(
     },
     dateAdded: {
       type: Date,
-      default: Date.now, // Automatically set creation date
+      default: Date.now,
     },
   },
   {
@@ -117,12 +134,14 @@ const productSchema = new Schema(
 );
 
 productSchema.index({ name: 1 });
-productSchema.index({ brand: 1 });
+productSchema.index({ designer: 1 });
 productSchema.index({ category: 1 });
+productSchema.index({ subCategory: 1 });
+productSchema.index({ price: 1 }); // Useful for sorting by price
 
 productSchema.pre("save", function (next) {
   next();
 });
 
-const product = mongoose.model("Product", productSchema);
-module.exports = product;
+const products = mongoose.model("FashionProduct", productSchema);
+module.exports = products;

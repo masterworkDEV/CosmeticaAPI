@@ -11,7 +11,6 @@ const userSchema = new Schema(
   {
     username: {
       type: String,
-      required: [true, "Username is required."],
       unique: true,
       trim: true,
       lowercase: true,
@@ -39,7 +38,7 @@ const userSchema = new Schema(
     roles: {
       User: {
         type: Number,
-        default: 2001, // Common default for a regular user
+        default: 2001,
       },
       Editor: Number,
       Admin: Number,
@@ -51,21 +50,18 @@ const userSchema = new Schema(
 
     firstName: {
       type: String,
-      required: [true, "Firstname is required."],
 
       trim: true,
       maxlength: [50, "First name cannot exceed 50 characters."],
     },
     lastName: {
       type: String,
-      required: [true, "Lastname is required."],
 
       trim: true,
       maxlength: [50, "Last name cannot exceed 50 characters."],
     },
     phoneNumber: {
       type: String,
-      required: [true, "Phone number is required."],
 
       trim: true,
       match: [/^\+?\d{10,15}$/, "Please enter a valid phone number."],
@@ -77,11 +73,10 @@ const userSchema = new Schema(
       zipCode: { type: String, trim: true },
       country: { type: String, trim: true },
     },
-    // Account Status
+
     isActive: {
-      // For enabling/disabling user accounts (e.g., after email verification)
       type: Boolean,
-      default: false, // Users might need to verify email to become active
+      default: false,
     },
     emailVerified: {
       type: Boolean,

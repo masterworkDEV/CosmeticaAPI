@@ -1,5 +1,3 @@
-//
-
 const Product = require("../model/Product");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
@@ -23,7 +21,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Use .fields() for multiple input fields, some single, some array
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
@@ -147,11 +144,10 @@ const createProduct = async (req, res) => {
       name,
       brand,
       category,
-      thumbnail: thumbnailData, // Assign thumbnail object
-      images: galleryImagesData, // Assign array of gallery image objects
-      ...req.body, // Spread any other fields from req.body
+      thumbnail: thumbnailData,
+      images: galleryImagesData,
+      ...req.body,
     });
-
     const product = await newProduct.save();
     res.status(201).json({
       success: true,
@@ -230,10 +226,6 @@ const updateProduct = async (req, res) => {
       }
     }
 
-    // --- Handle Gallery Images Update ---
-    // This logic ASSUMES that if new images are sent, they REPLACE the old gallery.
-    // If you need to ADD/REMOVE individual images, the logic here will be more complex,
-    // requiring client to send which images to keep/delete/add.
     if (req.files && req.files.images && req.files.images.length > 0) {
       // Delete ALL old gallery images
       if (existingProduct.images && existingProduct.images.length > 0) {
@@ -241,7 +233,6 @@ const updateProduct = async (req, res) => {
           await deleteFromCloudinary(img.imageId);
         }
       }
-      // Upload new gallery images
       const newGalleryImagesData = [];
       for (const file of req.files.images) {
         const result = await uploadToCloudinary(file);
@@ -250,10 +241,9 @@ const updateProduct = async (req, res) => {
           newlyUploadedImageIds.push(result.imageId);
         }
       }
-      updates.images = newGalleryImagesData; // Set the new array of gallery images
+      updates.images = newGalleryImagesData;
     }
 
-    // Perform the database update
     const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,

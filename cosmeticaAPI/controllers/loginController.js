@@ -33,7 +33,7 @@ const handleLogin = async (req, res) => {
       const accessToken = jwt.sign(
         { userInfo: { username: foundUser.username, roles: roles } },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "300s" } // 5 minutes
+        { expiresIn: "60s" } // 5 minutes
       );
 
       const refreshToken = jwt.sign(
@@ -47,9 +47,9 @@ const handleLogin = async (req, res) => {
 
       res.cookie("jwt", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "None",
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
       // 9. Send success response
@@ -87,7 +87,6 @@ const handleLogin = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "An unexpected error occurred during login.",
-      // details: error.message, // Consider removing `details` in production
     });
   }
 };
